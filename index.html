@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -6,104 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>چت خصوصی</title>
     <style>
-        /* تنظیمات مخصوص موبایل */
         * { box-sizing: border-box; }
-        body, html { 
-            margin: 0; padding: 0; 
-            height: 100dvh; /* ارتفاع دقیق موبایل */
-            width: 100%; 
-            font-family: Tahoma, sans-serif; 
-            background-color: #e5ddd5; 
-            overflow: hidden; 
-        }
-
-        /* --- صفحه ورود --- */
-        #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #075e54;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999; color: white;
-        }
-        .login-box {
-            background: white; padding: 25px; border-radius: 15px;
-            display: flex; flex-direction: column; gap: 15px; width: 85%; max-width: 300px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .login-input { padding: 12px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-size: 16px; }
-        .login-btn { padding: 12px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
-
-        /* --- صفحه چت --- */
-        #main-app { 
-            display: none; /* اول مخفی است */
-            flex-direction: column; 
-            height: 100dvh; 
-            position: relative;
-        }
-
-        /* هدر */
-        header { 
-            height: 50px; background-color: #075e54; color: white; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; flex-shrink: 0; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            position: relative;
-        }
+        body, html { margin: 0; padding: 0; height: 100dvh; width: 100%; font-family: Tahoma, sans-serif; background-color: #e5ddd5; overflow: hidden; }
         
-        /* نشانگر وضعیت اتصال */
-        #status-dot {
-            width: 10px; height: 10px; background-color: #ccc; border-radius: 50%;
-            position: absolute; left: 15px;
-        }
-        .online { background-color: #0f0 !important; box-shadow: 0 0 5px #0f0; }
+        /* عمومی */
+        button { cursor: pointer; border: none; font-family: inherit; }
+        .hidden { display: none !important; }
 
-        /* لیست پیام‌ها */
-        #chat-box { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding: 15px; padding-bottom: 20px;
-            display: flex; flex-direction: column; gap: 10px; 
-            background-image: linear-gradient(#e5ddd5 1px, transparent 1px), linear-gradient(90deg, #e5ddd5 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        /* صفحه ورود */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #075e54; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
+        .login-box { background: white; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; gap: 15px; width: 85%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .login-input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 16px; background: #f9f9f9; outline: none; }
+        .login-btn { padding: 12px; background: #25D366; color: white; border-radius: 8px; font-weight: bold; font-size: 16px; }
+        .admin-link { margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: underline; cursor: pointer; }
 
-        /* استایل پیام */
-        .msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; position: relative; word-wrap: break-word; line-height: 1.5; }
+        /* پنل مدیریت */
+        #admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 3000; display: flex; flex-direction: column; }
+        .admin-header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .user-list { flex: 1; overflow-y: auto; padding: 20px; }
+        .user-row { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .ban-btn { background: #ff4444; color: white; padding: 5px 15px; border-radius: 5px; font-size: 12px; }
+
+        /* صفحه چت */
+        #main-app { display: none; flex-direction: column; height: 100dvh; }
+        header { height: 60px; background-color: #075e54; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; position: relative; }
+        #chat-box { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-wrap: break-word; line-height: 1.5; }
         .me { align-self: flex-end; background-color: #dcf8c6; border-bottom-left-radius: 12px; }
         .other { align-self: flex-start; background-color: #fff; border-bottom-right-radius: 12px; }
-        .sender { font-size: 10px; color: #888; display: block; margin-bottom: 4px; }
-
-        /* کادر نوشتن (فیکس شده پایین) */
-        #input-area { 
-            height: 65px; background-color: #f0f0f0; 
-            display: flex; align-items: center; padding: 0 10px; 
-            border-top: 1px solid #ccc; flex-shrink: 0;
-        }
-        
+        .sender { font-size: 10px; color: #888; display: block; margin-bottom: 4px; font-weight: bold; }
+        #input-area { height: 70px; background-color: #f0f0f0; display: flex; align-items: center; padding: 0 10px; border-top: 1px solid #ccc; flex-shrink: 0; }
         #msg-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; outline: none; margin-left: 10px; font-size: 16px; }
-        .send-btn { background-color: #075e54; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
+        .send-btn { background-color: #075e54; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
-        <h3>ورود به چت خصوصی</h3>
         <div class="login-box">
-            <input type="text" id="username" class="login-input" placeholder="نام شما چیست؟">
-            <input type="password" id="password" class="login-input" placeholder="رمز عبور">
-            <button class="login-btn" onclick="checkLogin()">وارد شوید</button>
+            <h3 style="text-align:center; margin:0; color:#075e54;">گپ خصوصی</h3>
+            <input type="text" id="username" class="login-input" placeholder="نام کاربری">
+            <input type="password" id="password" class="login-input" placeholder="رمز عبور گروه">
+            <button class="login-btn" onclick="attemptLogin()">ورود</button>
+            <p id="error-text" style="color:red; font-size:12px; text-align:center; display:none;"></p>
         </div>
+        <span class="admin-link" onclick="showAdminLogin()">ورود مدیر</span>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+        <div class="admin-header">
+            <span>پنل مدیریت</span>
+            <button onclick="closeAdmin()" style="background:none; color:white; font-size:20px;">✕</button>
+        </div>
+        <div class="user-list" id="admin-list">
+            <p style="text-align:center; color:#777;">در حال دریافت لیست...</p>
+        </div>
+        <button onclick="fetchUsersForAdmin()" style="margin:10px; padding:15px; background:#075e54; color:white; border-radius:10px;">بروزرسانی لیست</button>
     </div>
 
     <div id="main-app">
-        <header>
-            <div id="status-dot"></div> گپ دوستانه
-        </header>
-
-        <div id="chat-box">
-            <div class="msg other"><span class="sender">سیستم</span>به چت خوش آمدید!</div>
-        </div>
-
+        <header>گپ دوستانه</header>
+        <div id="chat-box"></div>
         <div id="input-area">
             <button class="send-btn" onclick="sendMsg()">➤</button>
             <input type="text" id="msg-input" placeholder="پیام..." autocomplete="off">
@@ -111,91 +73,151 @@
     </div>
 
     <script>
-        // آدرس سرور کلودفلر شما
+        // 🚨 آدرس سرور کلودفلر خودت رو دقیق اینجا بذار
         const SERVER_URL = "https://rapid-fog-3a87.zareitahaofficial.workers.dev/"; 
-        const CORRECT_PASS = "dooste_taha";
-        let myName = "";
-        let lastMsgCount = 0;
+        const GROUP_PASS = "dooste_taha";
+        const ADMIN_PASS = "taha"; // رمز ادمین
 
-        // --- 1. لاگین ---
-        function checkLogin() {
+        let myName = "";
+
+        // --- بخش ورود کاربران ---
+        async function attemptLogin() {
             const userIn = document.getElementById('username').value.trim();
             const passIn = document.getElementById('password').value.trim();
+            const btn = document.querySelector('.login-btn');
 
-            if (userIn === "") { alert("لطفاً نام خود را وارد کنید"); return; }
-            
-            if (passIn === CORRECT_PASS) {
-                myName = userIn;
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-app').style.display = 'flex';
-                // شروع دریافت پیام‌ها
-                setInterval(getMessages, 2000);
-                getMessages();
-            } else {
-                alert("رمز عبور اشتباه است!");
+            if (passIn !== GROUP_PASS) return showError("رمز عبور اشتباه است!");
+            if (userIn.length < 3) return showError("نام کاربری کوتاه است!");
+
+            btn.innerText = "...";
+            try {
+                const res = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type: 'register', name: userIn })
+                });
+
+                if (res.status === 403) return showError("متاسفم! شما بن شده‌اید.");
+                if (res.status === 409) return showError("این نام قبلاً گرفته شده.");
+                
+                if (res.ok) {
+                    myName = userIn;
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('main-app').style.display = 'flex';
+                    startSync();
+                }
+            } catch (e) { showError("خطای اتصال"); }
+            btn.innerText = "ورود";
+        }
+
+        // --- بخش مدیریت (Admin) ---
+        function showAdminLogin() {
+            const pass = prompt("رمز مدیریت را وارد کنید:");
+            if (pass === ADMIN_PASS) {
+                document.getElementById('admin-panel').classList.remove('hidden');
+                fetchUsersForAdmin();
+            } else if (pass) {
+                alert("رمز مدیریت اشتباه است!");
             }
         }
 
-        // --- 2. ارسال پیام ---
+        function closeAdmin() {
+            document.getElementById('admin-panel').classList.add('hidden');
+        }
+
+        async function fetchUsersForAdmin() {
+            const listDiv = document.getElementById('admin-list');
+            listDiv.innerHTML = "در حال لود...";
+            
+            try {
+                const res = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type: 'admin_action', action: 'get_users', adminPass: ADMIN_PASS })
+                });
+                const data = await res.json();
+                
+                listDiv.innerHTML = "";
+                if (data.users.length === 0) listDiv.innerHTML = "<p style='text-align:center'>هیچ کاربری آنلاین نیست</p>";
+
+                data.users.forEach(u => {
+                    listDiv.innerHTML += `
+                        <div class="user-row">
+                            <strong>${u}</strong>
+                            <button class="ban-btn" onclick="banUser('${u}')">BAN ⛔</button>
+                        </div>
+                    `;
+                });
+            } catch (e) { listDiv.innerHTML = "خطا در دریافت لیست"; }
+        }
+
+        async function banUser(targetName) {
+            if(!confirm(`آیا مطمئنی میخوای ${targetName} رو بن کنی؟`)) return;
+            
+            await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    type: 'admin_action', 
+                    action: 'ban_user', 
+                    adminPass: ADMIN_PASS, 
+                    targetName: targetName 
+                })
+            });
+            alert(targetName + " بن شد!");
+            fetchUsersForAdmin(); // رفرش لیست
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-text');
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        // --- بخش چت ---
         async function sendMsg() {
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
             if (!text) return;
-
-            // نمایش سریع برای خودمان
-            addMessageToScreen(myName, text, true);
             input.value = '';
 
             try {
-                await fetch(SERVER_URL, {
+                const res = await fetch(SERVER_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: myName, text: text })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type: 'message', name: myName, text: text })
                 });
-                getMessages(); // بلافاصله آپدیت کن
-            } catch (e) { alert("ارسال نشد! اینترنت را چک کنید."); }
+                if(res.status === 403) { alert("شما بن شدید و نمی‌توانید پیام دهید!"); location.reload(); }
+                loadMessages();
+            } catch (e) {}
         }
 
-        // --- 3. دریافت پیام (رفرش خودکار) ---
-        async function getMessages() {
-            const dot = document.getElementById('status-dot');
+        async function loadMessages() {
             try {
-                // درخواست به سرور
                 const res = await fetch(SERVER_URL);
                 const data = await res.json();
+                const chatBox = document.getElementById('chat-box');
                 
-                // چراغ سبز میشه یعنی وصل شدیم
-                dot.classList.add('online');
-                setTimeout(() => dot.classList.remove('online'), 500);
-
-                // اگر تعداد پیام‌ها عوض شده، کل صفحه رو آپدیت کن
-                if (data.length > lastMsgCount) {
-                    const chatBox = document.getElementById('chat-box');
-                    chatBox.innerHTML = ''; // پاک کردن قدیمی‌ها
-                    
-                    data.forEach(m => {
-                        addMessageToScreen(m.name, m.text, m.name === myName);
-                    });
-                    
-                    lastMsgCount = data.length;
+                let content = "";
+                data.forEach(m => {
+                    const isMe = m.name === myName;
+                    content += `<div class="msg ${isMe ? 'me' : 'other'}">
+                        <span class="sender">${m.name}</span>${m.text}</div>`;
+                });
+                
+                if (chatBox.innerHTML !== content) {
+                    chatBox.innerHTML = content;
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 }
-            } catch(e) {
-                console.log("خطا در اتصال");
-            }
+            } catch (e) {}
         }
 
-        function addMessageToScreen(name, text, isMe) {
-            const box = document.getElementById('chat-box');
-            const div = document.createElement('div');
-            div.className = 'msg ' + (isMe ? 'me' : 'other');
-            div.innerHTML = `<span class="sender">${name}</span>${text}`;
-            box.appendChild(div);
-            // اسکرول به پایین
-            box.scrollTop = box.scrollHeight;
+        function startSync() {
+            loadMessages();
+            setInterval(loadMessages, 2000);
         }
 
-        // ارسال با اینتر
-        document.getElementById("msg-input").addEventListener("keypress", function(e) {
+        document.getElementById("msg-input").addEventListener("keypress", (e) => {
             if (e.key === "Enter") sendMsg();
         });
     </script>
