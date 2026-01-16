@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>چت خصوصی ما</title>
+    <style>
+        /* تنظیمات کلی صفحه */
+        body {
+            font-family: Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e5ddd5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* هدر بالای صفحه */
+        header {
+            background-color: #075e54;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* فضای چت */
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-image: linear-gradient(#e5ddd5 1px, transparent 1px), linear-gradient(90deg, #e5ddd5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* استایل پیام‌ها */
+        .message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        /* پیام‌های من (سبز) */
+        .my-message {
+            align-self: flex-end;
+            background-color: #dcf8c6;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 0;
+        }
+
+        /* پیام‌های دیگران (سفید) */
+        .other-message {
+            align-self: flex-start;
+            background-color: #fff;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 10px;
+        }
+
+        /* بخش ورودی پیام (پایین صفحه) */
+        #input-area {
+            background-color: #f0f0f0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #ccc;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        #send-btn {
+            background-color: #075e54;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* اسم فرستنده */
+        .sender-name {
+            font-size: 10px;
+            color: #555;
+            margin-bottom: 3px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        گپ دوستانه
+    </header>
+
+    <div id="chat-box">
+        <div class="message other-message">
+            <span class="sender-name">سیستم</span>
+            سلام! به چت روم خوش اومدی.
+        </div>
+    </div>
+
+    <div id="input-area">
+        <input type="text" id="message-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+        <button id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+
+    <script>
+        // --- اینجا مغز سایت است ---
+        
+        const chatBox = document.getElementById('chat-box');
+        const input = document.getElementById('message-input');
+
+        // تابع ارسال پیام
+        function sendMessage() {
+            const text = input.value.trim();
+            
+            if (text !== "") {
+                // 1. ساختن ظاهر پیام
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('message', 'my-message');
+                msgDiv.innerHTML = text;
+                
+                // 2. اضافه کردن به صفحه
+                chatBox.appendChild(msgDiv);
+                
+                // 3. خالی کردن کادر
+                input.value = "";
+                
+                // 4. اسکرول به پایین‌ترین پیام
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // --- بخش اتصال به سرور (بعداً اینجا را کامل می‌کنیم) ---
+                // فعلاً فقط پیام را به خودت نشان می‌دهد
+            }
+        }
+
+        // ارسال با زدن دکمه Enter
+        input.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
