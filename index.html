@@ -15,7 +15,7 @@
         /* صفحه ورود */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #075e54; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
         .login-box { background: white; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; gap: 15px; width: 85%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .login-input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 16px; background: #f9f9f9; outline: none; }
+        .login-input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 16px; background: #f9f9f9; outline: none; color: black; }
         .login-btn { padding: 12px; background: #25D366; color: white; border-radius: 8px; font-weight: bold; font-size: 16px; }
         .admin-link { margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: underline; cursor: pointer; }
 
@@ -23,7 +23,7 @@
         #admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 3000; display: flex; flex-direction: column; }
         .admin-header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .user-list { flex: 1; overflow-y: auto; padding: 20px; }
-        .user-row { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .user-row { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: black; }
         .ban-btn { background: #ff4444; color: white; padding: 5px 15px; border-radius: 5px; font-size: 12px; }
 
         /* صفحه چت */
@@ -45,7 +45,6 @@
         <div class="login-box">
             <h3 style="text-align:center; margin:0; color:#075e54;">گپ خصوصی</h3>
             <input type="text" id="username" class="login-input" placeholder="نام کاربری">
-            <input type="password" id="password" class="login-input" placeholder="رمز عبور گروه">
             <button class="login-btn" onclick="attemptLogin()">ورود</button>
             <p id="error-text" style="color:red; font-size:12px; text-align:center; display:none;"></p>
         </div>
@@ -73,24 +72,22 @@
     </div>
 
     <script>
-        // 🚨 آدرس سرور کلودفلر خودت رو دقیق اینجا بذار
-        const SERVER_URL = "https://rapid-fog-3a87.zareitahaofficial.workers.dev/"; 
-        const GROUP_PASS = "dooste_taha";
-        const ADMIN_PASS = "taha"; // رمز ادمین
+        // ✅ آدرس سرور وی‌پی‌اس شما
+        const SERVER_URL = "http://167.71.122.10/"; 
+        const ADMIN_PASS = "taha"; 
 
         let myName = "";
 
-        // --- بخش ورود کاربران ---
+        // --- بخش ورود ---
         async function attemptLogin() {
             const userIn = document.getElementById('username').value.trim();
-            const passIn = document.getElementById('password').value.trim();
             const btn = document.querySelector('.login-btn');
 
-            if (passIn !== GROUP_PASS) return showError("رمز عبور اشتباه است!");
             if (userIn.length < 3) return showError("نام کاربری کوتاه است!");
 
             btn.innerText = "...";
             try {
+                // درخواست ثبت نام به سرور جدید
                 const res = await fetch(SERVER_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -105,19 +102,22 @@
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('main-app').style.display = 'flex';
                     startSync();
+                } else {
+                    showError("خطا در اتصال به سرور");
                 }
-            } catch (e) { showError("خطای اتصال"); }
+            } catch (e) { 
+                console.log(e);
+                showError("اتصال برقرار نشد! (فیلترشکن یا تنظیمات Mixed Content را چک کنید)"); 
+            }
             btn.innerText = "ورود";
         }
 
-        // --- بخش مدیریت (Admin) ---
+        // --- بخش مدیریت ---
         function showAdminLogin() {
-            const pass = prompt("رمز مدیریت را وارد کنید:");
+            const pass = prompt("رمز مدیریت:");
             if (pass === ADMIN_PASS) {
                 document.getElementById('admin-panel').classList.remove('hidden');
                 fetchUsersForAdmin();
-            } else if (pass) {
-                alert("رمز مدیریت اشتباه است!");
             }
         }
 
@@ -127,8 +127,6 @@
 
         async function fetchUsersForAdmin() {
             const listDiv = document.getElementById('admin-list');
-            listDiv.innerHTML = "در حال لود...";
-            
             try {
                 const res = await fetch(SERVER_URL, {
                     method: 'POST',
@@ -138,7 +136,7 @@
                 const data = await res.json();
                 
                 listDiv.innerHTML = "";
-                if (data.users.length === 0) listDiv.innerHTML = "<p style='text-align:center'>هیچ کاربری آنلاین نیست</p>";
+                if (!data.users || data.users.length === 0) listDiv.innerHTML = "<p style='text-align:center'>هیچ کاربری نیست</p>";
 
                 data.users.forEach(u => {
                     listDiv.innerHTML += `
@@ -152,8 +150,7 @@
         }
 
         async function banUser(targetName) {
-            if(!confirm(`آیا مطمئنی میخوای ${targetName} رو بن کنی؟`)) return;
-            
+            if(!confirm(`بن کردن ${targetName}؟`)) return;
             await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -164,8 +161,8 @@
                     targetName: targetName 
                 })
             });
-            alert(targetName + " بن شد!");
-            fetchUsersForAdmin(); // رفرش لیست
+            alert("انجام شد");
+            fetchUsersForAdmin();
         }
 
         function showError(msg) {
@@ -179,17 +176,20 @@
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
             if (!text) return;
+            
+            // ذخیره مقدار و پاک کردن ورودی برای حس سرعت
+            const tempText = text; 
             input.value = '';
 
             try {
                 const res = await fetch(SERVER_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type: 'message', name: myName, text: text })
+                    body: JSON.stringify({ type: 'message', name: myName, text: tempText })
                 });
-                if(res.status === 403) { alert("شما بن شدید و نمی‌توانید پیام دهید!"); location.reload(); }
+                if(res.status === 403) { alert("شما بن شدید!"); location.reload(); }
                 loadMessages();
-            } catch (e) {}
+            } catch (e) { alert("ارسال نشد"); input.value = tempText; }
         }
 
         async function loadMessages() {
